@@ -1,1 +1,2 @@
-add : regist change list in index.
+add : regist change list in index
+commit : describe index status.
