@@ -8,7 +8,7 @@ endif
 set spec = $argv[1]
 
 # Cate/Func/Spec
-set dirs = `find $PRJ_DESIGN -mindepth 3 -maxdepth 3 -type d -iname "*$spec*" | rev | cut -d'/' -f1-3 | rev`
+set dirs = `find $PRJ_DESIGN -mindepth 2 -maxdepth 3 -type d -iname "*$spec*" | rev | cut -d'/' -f1-3 | rev`
 
 if ($#dirs < 1) then
 	echo "Error: Can't find $spec"
