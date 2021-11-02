@@ -1,3 +1,3 @@
-#!/bin/csh
+#!/bin/csh -f
 
 setenv tb "~/SoCstudy/VERIFICATION"
