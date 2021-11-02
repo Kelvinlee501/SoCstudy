@@ -2,4 +2,4 @@
 
 alias gohome   'cd $PRJ_HOME'
 alias godesign 'cd $PRJ_DESIGN'
-alias govefy   'cd $PRJ_VERIFICATION'
+alias govefy   'cd $PRJ_VERIFI'
