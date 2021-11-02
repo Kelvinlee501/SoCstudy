@@ -35,8 +35,8 @@ else
 	set num = 1
 endif
 
-if (-d $PRJ_DESIGN/$dirs[$num]) then
-	cd $PRJ_DESIGN/$dirs[$num]
+if (-d $PRJ_HOME/$dirs[$num]) then
+	cd $PRJ_HOME/$dirs[$num]
 else
 	echo "Error: Can't find $dirs[$num]"
 	exit 1
