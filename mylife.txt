@@ -1,3 +1,0 @@
-add : regist change list in index
-commit : describe index status.
-pull : take content in remort repo.
