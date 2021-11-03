@@ -1,13 +1,9 @@
-
-TEST?=$(shell cat "${WORKING_DIR}/tb/env.svh")
-TEMPLETE_DIR=~/SoCstudy/SCRIPT/compile/templete
-
 USING_TOOL?="iverilog"
+VCODE_PATH=$(WORKING_DIR)/../RTL/vcode.f
 
 IS_WSL=TRUE
 DUMP_EN=TRUE
 WORKING_NAME=work
-
 
 ifeq ($(IS_WSL), TRUE)
 	PRE_SCRIPT="cmd.exe /C "
@@ -20,11 +16,11 @@ VOPT_TB_SCR=$(PRE_SCRIPT)vopt $(WORKING_NAME).tb  -o opt_tb -logfile optimize_tb
 ifeq ($(DUMP_EN), TRUE)
 	VOPT_TB_SCR+= +acc
 endif
+
 VOPT_IP_SCR=$(PRE_SCRIPT)vopt $(WORKING_NAME).$(WORK_IP) -o opt_$(WORK_IP) -logfile optimize_$(WORK_IP).log
 ifeq ($(DUMP_EN), TRUE)
 	VOPT_IP_SCR+= +acc
 endif
-
 
 VSIM_SCR=$(PRE_SCRIPT)vsim $(WORKING_NAME).opt_tb
 ifeq ($(DUMP_EN), TRUE)
@@ -34,114 +30,70 @@ VSIM_SCR+= -logfile sim.log +$(TEST)
 
 VELAB_SCR=$(PRE_SCRIPT)vsim $(WORKING_NAME).opt_$(WORK_IP) -elab $(WORK_IP).lib -c
 
+RUN_SCRIPT := compile.csh
 
 define HELP_MSG
-=============================
+============================================
 Usage : make [option]
 Option: clean - clean up
 		setup - make directory and env.sh
-		compile - compile
-		sim - sim
-		run - compile and sim
-		gui - run gui of simulator
-		wave - waveform
-=============================
+		run - execute compile
+============================================
 endef
 export HELP_MSG
 
-.PHONY : default help clean setup compile sim rerun wave gui
+.PHONY : default help clean setup run iveriog_clean questa_clean iverilog_setup questa_setup iverilog_compile questa_compile
 
 default : help
 
 help :
 	@echo "$$HELP_MSG"
-	@echo $(WORK_IP)
 
 clean : iverilog_clean questa_clean
 	@if [ -e compile.log ] ; then \
 		rm -f compile.log ; fi; 
-	@if [ -e sim.log ] ; then \
-		rm -f sim.log ; fi;
-	@if [ $(USING_TOOL) != QuestaSim -a $(USING_TOOL) != iverilog ] ; then \
-		echo "ERROR : Unknown USING_TOOL"; fi;
 
 iverilog_clean :
-	@if [ -e dump.vcd ] ; then \
-		rm -f dump.vcd ; fi;
-	@if [ -d compile ] ; then \
-		rm -rf compile ; fi;
+	@if [ -d output ] ; then \
+		rm -rf output ; fi;
+	@if [ -e vcode.abs.f ] ; then \
+		rm -rf vcode.abs.f ; fi;
+	@if [ -e compile.csh ] ; then \
+		rm -rf compile.csh ; fi;
 
 questa_clean :
 	@if [ -d "$(WORKING_NAME)" ] ; then \
 		rm -rf "$(WORKING_NAME)" ; fi;
-	@if [ -e optimize_tb.log ] ; then \
-		rm -f optimize*.log ; fi;
-	@if [ -e transcript ] ; then \
-		rm -f transcript ; fi;
-	@if [ -e run.tcl ] ; then \
-		rm -f run.tcl ; fi;
-	@if [ -e vsim.wlf ] ; then \
-		rm -f vsim.wlf ; fi;
 
 setup : iverilog_setup questa_setup
-	@if [ ! -d src ] ; then \
-		mkdir src ; fi; 
-	@if [ ! -d tb ] ; then \
-		mkdir tb ; fi; 
-	@if [ ! -d compile ] ; then \
-		mkdir compile ; fi; 
-	@if [ ! -d tests ] ; then \
-		mkdir tests ; fi; 
-	@if [ ! -e src/vcode.f ] ; then \
-		echo src/${WORK_IP}.v > src/vcode.f ; fi; 
-	@if [ ! -e src/${WORK_IP}.v ] ; then \
-		cp ${TEMPLETE_DIR}/src_templete.v src/${WORK_IP}.v ; fi; 
-	@if [ ! -e tb/tb_vcode.f ] ; then \
-		echo tb/testbench.sv > tb/tb_vcode.f ; fi; 
-	@if [ ! -e tb/sim_param.svh ] ; then \
-		cp ${TEMPLETE_DIR}/sim_param.svh tb ; fi; 
-	@if [ ! -e tb/env.svh ] ; then \
-		cp ${TEMPLETE_DIR}/env.svh tb ; fi; 
-	@if [ ! -e tb/monitor.svh ] ; then \
-		cp ${TEMPLETE_DIR}/monitor.svh tb ; fi; 
-	@if [ ! -e tb/monitor.sv ] ; then \
-		cp ${TEMPLETE_DIR}/monitor.sv tb ; fi; 
-	@if [ ! -e tb/vip.svh ] ; then \
-		cp ${TEMPLETE_DIR}/vip.svh tb ; fi; 
-	@if [ ! -e tb/vip.sv ] ; then \
-		cp ${TEMPLETE_DIR}/vip.sv tb ; fi; 
-	@if [ ! -e tb/testbench.sv ] ; then \
-		cp ${TEMPLETE_DIR}/testbench.sv tb ; fi; 
-	@if [ -z "`find tests -type f`" ] ; then \
-		cp ${TEMPLETE_DIR}/test_templete.svh tests ; \
-		cp ${TEMPLETE_DIR}/test_templete.sv tests ; fi; 
 
 iverilog_setup : 
 ifeq ($(USING_TOOL), iverilog)
-	@if [ ! -d compile ] ; then \
-		mkdir compile ; fi; 
+	@if [ ! -d output ] ; then \
+		mkdir output ; fi; 
+	@if [ ! -e $(VCODE_PATH) ] ; then \
+		echo "[ERROR] There is not vcode.f\n$(VCODE_PATH)"; \
+	else \
+		cp -rpf $(VCODE_PATH) ./vcode.abs.f; \
+		echo "$(WORK_IP) $(USING_TOOL) setup done"; \
+	fi;
 endif
 
 questa_setup : 
 ifeq ($(USING_TOOL), QuestaSim)
 	@echo "run -all" > run.tcl
 	@"$(PRE_SCRIPT)vlib $(WORKING_NAME)"
+	@echo "$(WORK_IP) $(USING_TOOL) setup done"
 endif
 
-compile : iverilog_compile questa_compile
+run : iverilog_compile questa_compile
 
-iverilog_compile : 
+iverilog_compile :
 ifeq ($(USING_TOOL), iverilog)
-	@if [ ! -e src/vcode.f ] ; then \
-		echo "[ERROR] There is not vcode.f" ; \
-		echo "[ERROR] There is not vcode.f" > compile.log ;\
-	else \
-		iverilog -g2012 -o compile/${WORK_IP}.out \
-			 -f src/vcode.f \
-			 -f tb/tb_vcode.f \
-			 -I tb \
-			 2> compile.log ; \
-	fi;
+	@echo "#!/bin/csh -f" > $(RUN_SCRIPT)
+	@echo "iverilog -g2012 -o output/${WORK_IP}.out -f vcode.abs.f >> compile.log" >> $(RUN_SCRIPT)
+	@chmod u+x ./$(RUN_SCRIPT)
+	@./$(RUN_SCRIPT)
 endif
 
 questa_compile :
@@ -149,45 +101,3 @@ ifeq ($(USING_TOOL), QuestaSim)
 	@"$(VLOG_SCR)"
 	@"$(VOPT_TB_SCR)"
 endif
-
-sim : questa_sim iverilog_sim
-
-questa_sim : 
-ifeq ($(USING_TOOL), QuestaSim)
-	@"$(VSIM_SCR) -c -do run.tcl"
-endif
-
-iverilog_sim :
-ifeq ($(USING_TOOL), iverilog)
-	@if [ ! -e compile/${WORK_IP}.out ] ; then \
-		echo "[ERROR] There is not compile/${WORK_IP}.out" ; \
-		echo "[ERROR] There is not compile/${WORK_IP}.out" > sim.log ; \
-	else \
-		vvp -l sim.log compile/${WORK_IP}.out \
-			 +${TEST} ; \
-	fi;
-endif
-
-elab : 
-ifeq ($(USING_TOOL), iverilog)
-	echo "[ERROR] iveilog is not support elab"
-endif
-ifeq ($(USING_TOOL), QuestaSim)
-	@"$(VOPT_IP_SCR)"
-	@"$(VELAB_SCR)"
-	@mv $(WORK_IP).lib compile
-endif
-
-run : compile sim
-
-gui : 
-ifeq ($(USING_TOOL), iverilog)
-	echo "[ERROR] iveilog is not support gui"
-endif
-ifeq ($(USING_TOOL), QuestaSim)
-	@"$(VSIM_SCR) &"
-endif
-
-wave : 
-	@gtkwave dump.vcd &
-
