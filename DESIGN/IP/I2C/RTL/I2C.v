@@ -1,0 +1,14 @@
+////////////////////////////////////
+//
+//
+//
+////////////////////////////////////
+
+module I2C #(
+	parameter			PARAM = 1	
+) (
+	input						I_CLK,
+	input						I_RESETn
+);
+
+endmodule

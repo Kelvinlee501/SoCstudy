@@ -1,0 +1,29 @@
+TEMPLETE_DIR=$(PRJ_SCRIPT)/common/DESIGN
+
+define HELP_MSG
+============================================
+Usage : make [option]
+Option: setup - make directory and copy makefiles
+============================================
+endef
+export HELP_MSG
+
+.PHONY : default help setup
+
+default : help
+
+help :
+	@echo "$$HELP_MSG"
+
+setup : 
+	@if [ ! -d SIM ] ; then \
+		mkdir SIM ; fi;
+	@if [ ! -d compile ] ; then \
+		mkdir compile ; \
+		cp $(PRJ_SCRIPT)/compile/makefile compile ; fi;
+	@if [ ! -d RTL ] ; then \
+		mkdir RTL; \
+		echo $(WORKING_DIR)/RTL/$(WORK_IP).v > RTL/vcode.f ; \
+		sed s/src_templete/${WORK_IP}/ ${TEMPLETE_DIR}/src_templete.v > RTL/${WORK_IP}.v ; \
+		cp $(PRJ_SCRIPT)/ip_sim/makefile SIM; fi;
+		
