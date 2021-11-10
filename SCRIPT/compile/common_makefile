@@ -3,32 +3,15 @@ VCODE_PATH=$(WORKING_DIR)/../RTL/vcode.f
 
 IS_WSL=TRUE
 DUMP_EN=TRUE
-WORKING_NAME=work
+WORKING_NAME=output
 
 ifeq ($(IS_WSL), TRUE)
-	PRE_SCRIPT="cmd.exe /C "
-else 
-	PRE_SCRIPT=""
+	EXE=".exe"
 endif
 
-VLOG_SCR=$(PRE_SCRIPT)vlog -f src/vcode.f -f tb/tb_vcode.f -logfile compile.log 
-VOPT_TB_SCR=$(PRE_SCRIPT)vopt $(WORKING_NAME).tb  -o opt_tb -logfile optimize_tb.log
-ifeq ($(DUMP_EN), TRUE)
-	VOPT_TB_SCR+= +acc
-endif
-
-VOPT_IP_SCR=$(PRE_SCRIPT)vopt $(WORKING_NAME).$(WORK_IP) -o opt_$(WORK_IP) -logfile optimize_$(WORK_IP).log
-ifeq ($(DUMP_EN), TRUE)
-	VOPT_IP_SCR+= +acc
-endif
-
-VSIM_SCR=$(PRE_SCRIPT)vsim $(WORKING_NAME).opt_tb
-ifeq ($(DUMP_EN), TRUE)
-	VSIM_SCR+= -voptargs="+acc"
-endif
-VSIM_SCR+= -logfile sim.log +$(TEST)
-
-VELAB_SCR=$(PRE_SCRIPT)vsim $(WORKING_NAME).opt_$(WORK_IP) -elab $(WORK_IP).lib -c
+VLOG_LIB_SCR:=vlog$(EXE) -work $(WORKING_NAME) -f $(WORKING_DIR)/../RTL/vcode.f -logfile compile.log 
+VOPT_LIB_SCR:=vopt$(EXE) -work $(WORKING_NAME) $(WORKING_NAME).$(WORK_IP) -o opt_$(WORK_IP) -logfile optimize.log
+VELAB_SCR=vsim$(EXE) $(WORKING_NAME).opt_$(WORK_IP) -elab output/$(WORK_IP).lib -c
 
 RUN_SCRIPT := compile.csh
 
@@ -52,52 +35,56 @@ help :
 clean : iverilog_clean questa_clean
 	@if [ -e compile.log ] ; then \
 		rm -f compile.log ; fi; 
-
-iverilog_clean :
-	@if [ -d output ] ; then \
-		rm -rf output ; fi;
 	@if [ -e vcode.abs.f ] ; then \
 		rm -rf vcode.abs.f ; fi;
 	@if [ -e compile.csh ] ; then \
 		rm -rf compile.csh ; fi;
 
+iverilog_clean :
+	@if [ -d output ] ; then \
+		rm -rf output ; fi;
+
 questa_clean :
 	@if [ -d "$(WORKING_NAME)" ] ; then \
 		rm -rf "$(WORKING_NAME)" ; fi;
+	@if [ -e optimize.log ] ; then \
+		rm -rf optimize.log ; fi;
+	@if [ -e transcript ] ; then \
+		rm -rf transcript ; fi;
 
 setup : iverilog_setup questa_setup
-
-iverilog_setup : 
-ifeq ($(USING_TOOL), iverilog)
-	@if [ ! -d output ] ; then \
-		mkdir output ; fi; 
 	@if [ ! -e $(VCODE_PATH) ] ; then \
 		echo "[ERROR] There is not vcode.f\n$(VCODE_PATH)"; \
 	else \
 		cp -rpf $(VCODE_PATH) ./vcode.abs.f; \
 		echo "$(WORK_IP) $(USING_TOOL) setup done"; \
 	fi;
+
+iverilog_setup : 
+ifeq ($(USING_TOOL), iverilog)
+	@if [ ! -d output ] ; then \
+		mkdir output ; fi; 
 endif
 
 questa_setup : 
 ifeq ($(USING_TOOL), QuestaSim)
-	@echo "run -all" > run.tcl
-	@"$(PRE_SCRIPT)vlib $(WORKING_NAME)"
-	@echo "$(WORK_IP) $(USING_TOOL) setup done"
+	@vlib$(EXE) $(WORKING_NAME)
 endif
 
 run : iverilog_compile questa_compile
+	@chmod u+x ./$(RUN_SCRIPT)
+	@./$(RUN_SCRIPT)
 
 iverilog_compile :
 ifeq ($(USING_TOOL), iverilog)
 	@echo "#!/bin/csh -f" > $(RUN_SCRIPT)
 	@echo "iverilog -g2012 -o output/${WORK_IP}.out -f vcode.abs.f >> compile.log" >> $(RUN_SCRIPT)
-	@chmod u+x ./$(RUN_SCRIPT)
-	@./$(RUN_SCRIPT)
 endif
 
 questa_compile :
 ifeq ($(USING_TOOL), QuestaSim)
-	@"$(VLOG_SCR)"
-	@"$(VOPT_TB_SCR)"
+	@echo "#!/bin/csh -f" > $(RUN_SCRIPT)
+	@echo "$(VLOG_LIB_SCR)" >> $(RUN_SCRIPT)
+	@echo "$(VOPT_LIB_SCR)" >> $(RUN_SCRIPT)
+	@echo "$(VELAB_SCR)" >> $(RUN_SCRIPT)
 endif
