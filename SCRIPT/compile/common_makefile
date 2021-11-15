@@ -9,7 +9,7 @@ ifeq ($(IS_WSL), TRUE)
 	EXE=".exe"
 endif
 
-VLOG_LIB_SCR:=vlog$(EXE) -work $(WORKING_NAME) -f $(WORKING_DIR)/../RTL/vcode.f -logfile compile.log 
+VLOG_LIB_SCR:=vlog$(EXE) -work $(WORKING_NAME) -f $(WORKING_DIR)/./vcode.abs.f -logfile compile.log 
 VOPT_LIB_SCR:=vopt$(EXE) -work $(WORKING_NAME) $(WORKING_NAME).$(WORK_IP) -o opt_$(WORK_IP) -logfile optimize.log
 VELAB_SCR=vsim$(EXE) $(WORKING_NAME).opt_$(WORK_IP) -elab output/$(WORK_IP).lib -c
 
