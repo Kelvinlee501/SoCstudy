@@ -1,0 +1,36 @@
+Using language generation: IEEE1800-2012,no-specify,xtypes,icarus-misc
+PARSING INPUT
+LOCATING TOP-LEVEL MODULES
+   I2C_IF
+ELABORATING DESIGN
+RUNNING FUNCTORS
+ ... Iteration detected 0 optimizations.
+ ... Look for dangling constants
+ ... done
+ ... scan for dangling signal and event nodes. (scomplete=F, ecomplete=F)
+ ... 1 iterations deleted 0 dangling signals and 0 events.
+ ... done
+CALCULATING ISLANDS
+CODE GENERATION
+ ... invoking target_design
+STATISTICS
+lex_string: add_count=60 hit_count=8
+Icarus Verilog version 10.3 (stable) ()
+
+Copyright 1998-2015 Stephen Williams
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program; if not, write to the Free Software Foundation, Inc.,
+  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+translate: /usr/lib/x86_64-linux-gnu/ivl/ivlpp  -v -L -F"/tmp/ivrlg27678d16c" -f"/tmp/ivrlg7678d16c" -p"/tmp/ivrli7678d16c"  | /usr/lib/x86_64-linux-gnu/ivl/ivl -v -C"/tmp/ivrlh7678d16c" -C"/usr/lib/x86_64-linux-gnu/ivl/vvp.conf" -- -

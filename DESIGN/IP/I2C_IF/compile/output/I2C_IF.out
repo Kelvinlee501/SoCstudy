@@ -1,0 +1,23 @@
+#! /usr/bin/vvp -v
+:ivl_version "10.3 (stable)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision + 0;
+:vpi_module "system";
+:vpi_module "vhdl_sys";
+:vpi_module "v2005_math";
+:vpi_module "va_math";
+:vpi_module "v2009";
+S_0x5564dd1c63c0 .scope module, "I2C_IF" "I2C_IF" 2 7;
+ .timescale 0 0;
+    .port_info 0 /INPUT 1 "I_CLK"
+    .port_info 1 /INPUT 1 "I_RESETn"
+P_0x5564dd1c6540 .param/l "PARAM" 0 2 8, +C4<00000000000000000000000000000001>;
+o0x7f9f9fa0b018 .functor BUFZ 1, C4<z>; HiZ drive
+v0x5564dd1c65e0_0 .net "I_CLK", 0 0, o0x7f9f9fa0b018;  0 drivers
+o0x7f9f9fa0b048 .functor BUFZ 1, C4<z>; HiZ drive
+v0x5564dd208750_0 .net "I_RESETn", 0 0, o0x7f9f9fa0b048;  0 drivers
+# The file index is used to find the file name in the following table.
+:file_names 3;
+    "N/A";
+    "<interactive>";
+    "/home/kelvinlee/SoCstudy/DESIGN/IP/I2C_IF/RTL/I2C_IF.v";
