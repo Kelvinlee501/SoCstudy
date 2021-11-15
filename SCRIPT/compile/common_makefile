@@ -9,7 +9,7 @@ ifeq ($(IS_WSL), TRUE)
 	EXE=".exe"
 endif
 
-VLOG_LIB_SCR:=vlog$(EXE) -work $(WORKING_NAME) -f $(WORKING_DIR)/./vcode.abs.f -logfile compile.log 
+VLOG_LIB_SCR:=vlog$(EXE) -work $(WORKING_NAME) -f $(WORKING_DIR)/vcode.abs.f -logfile compile.log 
 VOPT_LIB_SCR:=vopt$(EXE) -work $(WORKING_NAME) $(WORKING_NAME).$(WORK_IP) -o opt_$(WORK_IP) -logfile optimize.log
 VELAB_SCR=vsim$(EXE) $(WORKING_NAME).opt_$(WORK_IP) -elab output/$(WORK_IP).lib -c
 
@@ -57,6 +57,7 @@ setup : iverilog_setup questa_setup
 		echo "[ERROR] There is not vcode.f\n$(VCODE_PATH)"; \
 	else \
 		cp -rpf $(VCODE_PATH) ./vcode.abs.f; \
+		sed -i 's@\$$PRJ_DESIGN@$(PRJ_DESIGN)@g' vcode.abs.f ; \
 		echo "$(WORK_IP) $(USING_TOOL) setup done"; \
 	fi;
 
@@ -78,7 +79,7 @@ run : iverilog_compile questa_compile
 iverilog_compile :
 ifeq ($(USING_TOOL), iverilog)
 	@echo "#!/bin/csh -f" > $(RUN_SCRIPT)
-	@echo "iverilog -g2012 -o output/${WORK_IP}.out -f vcode.abs.f >> compile.log" >> $(RUN_SCRIPT)
+	@echo "iverilog -g2012 -o output/${WORK_IP}.out -f vcode.abs.f -v | tee compile.log" >> $(RUN_SCRIPT)
 endif
 
 questa_compile :

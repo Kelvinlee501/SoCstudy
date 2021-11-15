@@ -28,6 +28,5 @@ setup :
 		cp $(PRJ_SCRIPT)/compile/makefile compile ; fi;
 	@if [ ! -d RTL ] ; then \
 		mkdir RTL; \
-		echo $(WORKING_DIR)/RTL/$(WORK_IP).v > RTL/vcode.f ; \
+		echo "\$$PRJ_DESIGN/IP/$(WORK_IP)/RTL/$(WORK_IP).v" > RTL/vcode.f ; \
 		sed s/src_templete/${WORK_IP}/ ${TEMPLETE_DIR}/src_templete.v > RTL/${WORK_IP}.v ; fi;
-		
