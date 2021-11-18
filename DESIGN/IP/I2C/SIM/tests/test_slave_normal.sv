@@ -17,6 +17,7 @@ module test_slave_normal;
 		apb_model.apb4m_config;
 
         TASK_CONFIG_SLAVE_MODE;
+        TASK_SINGLE_TRANSACTION_SLAVE;
     endtask
 
     task TASK_CONFIG_SLAVE_MODE;
@@ -32,9 +33,23 @@ module test_slave_normal;
     endtask
 
     task TASK_SINGLE_TRANSACTION_SLAVE;
+        
+       reg [7:0] data;
        $display("[INFO] Single transaction start for testing slave mode "); 
 
-       task_i2c_vip_write(`DEVICE_ADDR,8'b1010_1010);
+       // I2C vip master write single write transaction.
+       // 'William' will describe this task below.
+       task_i2c_vip_m_single_write(`DEVICE_ADDR,8'b1010_1010);
+        
+       //It will be wrapped in task_apb.sv 
+       top.apb4m_vip.task_apb_read(_result,`RX_DATA_ADDR,data);
+
+       if(data == 8'b1010_1010) begin
+            $display("\n TEST PASSED\n");
+       end
+       else begin
+            $display("\n TEST FAILED\n");
+       end
     endtask
 
     task task_sfr_config;
@@ -44,10 +59,10 @@ module test_slave_normal;
         integer _result;
 
         top.apb4m_vip.task_apb_write(_result,p_sfr_addr,data);
-        //Need to check SCL,SDA is high... 
+        //In my opinion, need to check SCL,SDA is high... 
     endtask
 
     task task_i2c_vip_config;
-        input mode;
+        input i2c_ms_mode;
     endtask
 endmodule
