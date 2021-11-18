@@ -169,4 +169,6 @@ module task_apb;
 		top.apb4m_vip.task_apb_write(_result, `ADDR_DMA_END_ADDR, _addr);
 	end
 	endtask
+
+    task  
 endmodule

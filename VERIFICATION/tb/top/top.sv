@@ -19,7 +19,6 @@ module top;
 	`endif
 
 	//TOP module instanciation
-	
 	I2C #(
 		.PARAM(PARAM_TEMPLETE)
 	) dut (
