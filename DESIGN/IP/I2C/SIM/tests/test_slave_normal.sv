@@ -48,7 +48,7 @@ module test_slave_normal;
        input [7:0] w_data;
         
        reg [31:0] data;
-       $display("[INFO] Single transaction start for testing slave mode "); 
+       $display("[INFO] One byte transaction start for testing slave mode "); 
 
        // I2C vip master write single write transaction.
        // 'William' will describe this task below.
@@ -63,7 +63,34 @@ module test_slave_normal;
        else begin
             $display("TEST FAILED");
        end
+    endtask
 
+    task TASK_MULTI_BYTE_TRANSACTION_SLAVE;
+       input integer n;
+       input [(8*n)-1:0] w_data;
+        
+       integer i;
+
+       reg [31:0] data;
+       reg [(8*n)-1:0] tmp_data;
+
+       $display("[INFO] %d byte transaction start for testing slave mode",n); 
+
+       // I2C vip master write single write transaction.
+       // 'William' will describe this task below.
+       task_i2c_vip_m_multi_byte_write(`DEVICE_ADDR,w_data);
+        
+       //It will be wrapped in task_apb.sv 
+       for(i=0;i=(n/4)+1;i++) begin
+            top.apb4m_vip.task_apb_read(_result,`RX_DATA_ADDR,data);
+       end
+
+       //temporarily compare point
+       if(data[7:0] == w_data) begin
+            $display("TEST PASSED");
+       else begin
+            $display("TEST FAILED");
+       end
     endtask
 
     task task_sfr_config;
